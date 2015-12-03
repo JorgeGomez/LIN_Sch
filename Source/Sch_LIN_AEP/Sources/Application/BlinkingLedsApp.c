@@ -82,45 +82,6 @@ void toggle_led1(void)
 	led_toggle(LED_1);
 }
 
-/**************************************************************
- *  Name                 :  toggle_led2
- *  Description          :  Function for the task number 2
- *  Parameters           :  void
- *  Return               :  void
- *  Precondition         :  This function must each 50 ticks.
- *  Postcondition        :  The LED 2 changes.
- **************************************************************/
-void toggle_led2(void)
-{
-	led_toggle(LED_2);
-}
-
-/**************************************************************
- *  Name                 :  toggle_led3
- *  Description          :  Function for the task number 3
- *  Parameters           :  void
- *  Return               :  void
- *  Precondition         :  This function must each 100 ticks.
- *  Postcondition        :  The LED 3 changes.
- **************************************************************/
-void toggle_led3(void)
-{
-	led_toggle(LED_3);
-}
-
-/**************************************************************
- *  Name                 :  toggle_led4
- *  Description          :  Function for the task number 4
- *  Parameters           :  void
- *  Return               :  void
- *  Precondition         :  This function must each 500 ticks.
- *  Postcondition        :  The LED 4 changes.
- **************************************************************/
-void toggle_led4(void)
-{
-	led_toggle(LED_4);
-}
-
 /* Exported functions */
 /*============================================================================*/
 

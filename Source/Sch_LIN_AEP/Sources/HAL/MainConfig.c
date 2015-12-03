@@ -143,21 +143,15 @@ void initPeriClkGen(void)
  **************************************************************/
 void config_Emb_IO(void)
 {
-  	/* leds are seted as outputs */
+  	/* led is seted as outputs */
   	SIU.PCR[LED_1].R = 0x200;
-  	SIU.PCR[LED_2].R = 0x200;
-  	SIU.PCR[LED_3].R = 0x200;
-	SIU.PCR[LED_4].R = 0x200;
   		
   	/* Embedded board buttons are seted as inputs */
 //  	SIU.PCR[PUSHB_1].R = 0x100;	
 //  	SIU.PCR[PUSHB_2].R = 0x100;
 
-  	/* leds init leds in off */
+  	/* led init led in off */
 	SIU.GPDO[LED_1].R = OFF;
-	SIU.GPDO[LED_2].R = OFF;
-	SIU.GPDO[LED_3].R = OFF;
-	SIU.GPDO[LED_4].R = OFF;
 
 } 
 
