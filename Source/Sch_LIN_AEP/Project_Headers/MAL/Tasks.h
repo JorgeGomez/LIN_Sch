@@ -73,7 +73,7 @@ typedef enum {
 
 /* Exported functions prototypes */
 /*============================================================================*/
-PUBLIC_FCT void toggle_led1(void);
+PUBLIC_FCT void LED_StateMachine(void);
 
 /* Functions prototypes */
 /*============================================================================*/

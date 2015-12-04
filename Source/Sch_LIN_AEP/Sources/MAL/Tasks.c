@@ -65,7 +65,6 @@ const S_TASK cas_TaskList[NUMBER_OF_TASKS] =
 
 /* Variables */
 /*============================================================================*/
-T_UBYTE ruw_waint2In = 0;
 
 
 
@@ -97,12 +96,7 @@ T_UBYTE ruw_waint2In = 0;
   **************************************************************/
 void Task1_50ticks(void)
 {
-	ruw_waint2In++;
-	if(ruw_waint2In == 2)
-	{
-	toggle_led1();
-	ruw_waint2In = 1;
-	}
+	LED_StateMachine();
 }
 
 /* Exported functions */

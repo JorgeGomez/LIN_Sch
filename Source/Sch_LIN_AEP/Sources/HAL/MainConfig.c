@@ -58,6 +58,7 @@
 /* Variables */
 /*============================================================================*/
 T_BOOLEAN rbi_TickFlag = FALSE;
+T_UBYTE ruw_waint2In = 0;
 
 /* Private functions prototypes */
 /*============================================================================*/
@@ -228,6 +229,12 @@ void led_off(T_UBYTE lub_Ch)
  **************************************************************/
 void led_toggle(T_UBYTE lub_Ch)
 {
+	ruw_waint2In++;
+	    	  if(ruw_waint2In == 2)
+	    	     {
+	    	     led_toggle(LED_1);
+	    	     ruw_waint2In = 1;
+	    	     }
 	SIU.GPDO[lub_Ch].R ^= 1;
 }
 
