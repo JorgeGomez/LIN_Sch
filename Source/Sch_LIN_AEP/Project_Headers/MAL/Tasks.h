@@ -62,9 +62,6 @@ typedef struct{
 
 typedef enum {
 	TASK1,
-	TASK2,
-	TASK3,
-	TASK4,
 	/*number of task*/
 	NUMBER_OF_TASKS
 }E_NUMTASK;
@@ -76,16 +73,10 @@ typedef enum {
 
 /* Exported functions prototypes */
 /*============================================================================*/
-PUBLIC_FCT void toggle_led1(void);
-PUBLIC_FCT void toggle_led2(void);
-PUBLIC_FCT void toggle_led3(void);
-PUBLIC_FCT void toggle_led4(void);
+PUBLIC_FCT void LED_StateMachine(void);
 
 /* Functions prototypes */
 /*============================================================================*/
-void Task1_10ticks(void);
-void Task2_50ticks(void);
-void Task3_100ticks(void);
-void Task4_500ticks(void);
+void Task1_50ticks(void);
 
 #endif /* TASKS_H_ */  /* Notice: the file ends with a blank new line to avoid compiler warnings */

@@ -33,6 +33,9 @@
 /*----------------------------------------------------------------------------*/
 /*   1.0 		|  	Nov/13/15		| initialize the GPIO     |  Jorge Gomez  */
 /*============================================================================*/
+/*   1.1		|   Dic/03/15       |Changes were added to the|Jose Luis Mtz  */
+/*  			|					|  configuration for LIN  |	 	          */
+/*============================================================================*/
 /*                              					                          */
 /*============================================================================*/
 /*
@@ -55,6 +58,7 @@
 /* Variables */
 /*============================================================================*/
 T_BOOLEAN rbi_TickFlag = FALSE;
+T_UBYTE ruw_waint2In = 0;
 
 /* Private functions prototypes */
 /*============================================================================*/
@@ -143,21 +147,15 @@ void initPeriClkGen(void)
  **************************************************************/
 void config_Emb_IO(void)
 {
-  	/* leds are seted as outputs */
+  	/* led is seted as outputs */
   	SIU.PCR[LED_1].R = 0x200;
-  	SIU.PCR[LED_2].R = 0x200;
-  	SIU.PCR[LED_3].R = 0x200;
-	SIU.PCR[LED_4].R = 0x200;
   		
   	/* Embedded board buttons are seted as inputs */
 //  	SIU.PCR[PUSHB_1].R = 0x100;	
 //  	SIU.PCR[PUSHB_2].R = 0x100;
 
-  	/* leds init leds in off */
+  	/* led init led in off */
 	SIU.GPDO[LED_1].R = OFF;
-	SIU.GPDO[LED_2].R = OFF;
-	SIU.GPDO[LED_3].R = OFF;
-	SIU.GPDO[LED_4].R = OFF;
 
 } 
 
@@ -231,6 +229,12 @@ void led_off(T_UBYTE lub_Ch)
  **************************************************************/
 void led_toggle(T_UBYTE lub_Ch)
 {
+	ruw_waint2In++;
+	    	  if(ruw_waint2In == 2)
+	    	     {
+	    	     led_toggle(LED_1);
+	    	     ruw_waint2In = 1;
+	    	     }
 	SIU.GPDO[lub_Ch].R ^= 1;
 }
 

@@ -1,19 +1,21 @@
 /*============================================================================*/
-/*                         			AEP		                                  */
+/*                                  AEP		                                  */
 /*============================================================================*/
 /*                        OBJECT SPECIFICATION                                */
 /*============================================================================*/
 /*!
- * $Source: BlinkingLedsApp.c $
- * $Revision: 1.0 $
- * $Author: Jorge Gomez $
- * $Date: Nov/12/15 $
+ * $Source: Slave_Actions.h $
+ * $Revision: version 1.0$
+ * $Author: Jose Luis Martinez $
+ * $Date: 03/12/2015 $
  */
 /*============================================================================*/
 /* DESCRIPTION :                                                              */
-/** \BlinkingLedsApp
-    Provide the application for each task.
-    Do the embedded LEDs blink.
+/** \file
+    short description in one sentence end with dot.
+    detailed
+    multiline
+    description of the file
 */
 /*============================================================================*/
 /* COPYRIGHT (C) CONTINENTAL AUTOMOTIVE 2014                                  */
@@ -28,64 +30,38 @@
 /*                                                                            */
 /*============================================================================*/
 /*============================================================================*/
+/*                    REUSE HISTORY - taken over from                         */
+/*============================================================================*/
+/*  DATABASE           |        PROJECT     | FILE VERSION (AND INSTANCE)     */
+/*----------------------------------------------------------------------------*/
+/*                     |LIN network Slave 4 |            1.0                  */
+/*					   |					|  Project_Headers/Application    */
+/*============================================================================*/
 /*                               OBJECT HISTORY                               */
 /*============================================================================*/
-/*  REVISION 	|  		DATE  		|     COMMENT	     	  |		AUTHOR 	  */
-/*----------------------------------------------------------------------------*/
-/*   1.0 		|  	Nov/13/15		| 		added task		  |  Jorge Gomez  */
-/*============================================================================*/
-/*   1.1		|   Dic/03/15       |unnecessary tasks were   |Jose Luis Mtz  */
-/*  			|					|		removed			  |	 	          */
-/*============================================================================*/
 /*
- * $Log: BlinkingLedsApp.c  $
+ * $Log: filename.h  $
   ============================================================================*/
+#ifndef SLAVE_ACTIONS_H_
+#define SLAVE_ACTIONS_H_
 
 /* Includes */
 /*============================================================================*/
-#include "Application/BlinkingLedsApp.h"
+#include "HAL/stdtypedef.h"
+#include "HAL/MainConfig.h"
 
-
-/* Constants and types  */
+/* Constants and types */
 /*============================================================================*/
 
 
-
-/* Variables */
+/* Exported Variables */
 /*============================================================================*/
 
 
-
-/* Private functions prototypes */
+/* Exported functions prototypes */
 /*============================================================================*/
+ PUBLIC_FCT void Slave_Actions (void);
+ PUBLIC_FCT void LED_StateMachine(void);
 
 
-
-/* Inline functions */
-/*============================================================================*/
-
-
-
-
-/* Private functions */
-/*============================================================================*/
-
-/**************************************************************
- *  Name                 :  toggle_led1
- *  Description          :  Function for the task number 1
- *  Parameters           :  void
- *  Return               :  void
- *  Precondition         :  This function must each 10 ticks.
- *  Postcondition        :  The LED 1 changes.
- **************************************************************/
-void toggle_led1(void)
-{
-	led_toggle(LED_1);
-}
-
-/* Exported functions */
-/*============================================================================*/
-
-
-
- /* Notice: the file ends with a blank new line to avoid compiler warnings */
+#endif /* Notice: the file ends with a blank new line to avoid compiler warnings */

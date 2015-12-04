@@ -71,11 +71,7 @@ T_ULONG raul_TimeCounter[NUMBER_OF_TASKS];
 /*============================================================================*/
 
 /*Add a new prototipe if you need a new task*/
-PUBLIC_FCT void Task1_10ticks(void);
-PUBLIC_FCT void Task2_50ticks(void);
-PUBLIC_FCT void Task3_100ticks(void);
-PUBLIC_FCT void Task4_500ticks(void);
-
+PUBLIC_FCT void Task1_50ticks(void);
 
 /* Exported functions */
 /*============================================================================*/

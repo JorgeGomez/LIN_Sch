@@ -34,6 +34,9 @@
 /*----------------------------------------------------------------------------*/
 /*   1.0 		|  	Nov/13/15		| 	  Added new tasks  	  |  Jorge Gomez  */
 /*============================================================================*/
+/*   1.1		|   Dic/03/15       |Unnecessary tasks were   |Jose Luis Mtz  */
+/*  			|					|		removed			  |	 	          */
+/*============================================================================*/
 /*                      				 		                              */
 /*============================================================================*/
 /*
@@ -55,10 +58,7 @@
 const S_TASK cas_TaskList[NUMBER_OF_TASKS] = 
 {
 	/*	Name					Execution Period(ticks)		Startup delay(ticks)	*/
-	{	Task1_10ticks,					10,							1	},
-	{	Task2_50ticks,					50, 						2	},
-	{	Task3_100ticks,					100, 						3	},
-	{	Task4_500ticks,					500, 						4	}
+	{	Task1_50ticks,					50, 						1	},
 /*	{	Taskn,							Period, 				  offset}	Add if you need a new task*/
 };
 
@@ -86,58 +86,18 @@ const S_TASK cas_TaskList[NUMBER_OF_TASKS] =
  * --------Add a new definition if you need a new task--------------------------
  * */
 
-/**************************************************************
- *  Name                 :  Task1_10ticks
- *  Description          :  Init function of Scheduler module
- *  Parameters           :  void
- *  Return               :  void
- *  Precondition         :  This function must be called after cpu initialization.
- *  Postcondition        :  Function gsc_sch_core_exec can be called.
- **************************************************************/
- void Task1_10ticks(void)
-{
-	toggle_led1();
-}
-
  /**************************************************************
-  *  Name                 :  Task2_50ticks
+  *  Name                 :  Task1_50ticks
   *  Description          :  Init function of Scheduler module
   *  Parameters           :  void
   *  Return               :  void
   *  Precondition         :  This function must be called after cpu initialization.
   *  Postcondition        :  Function gsc_sch_core_exec can be called.
   **************************************************************/
-void Task2_50ticks(void)
+void Task1_50ticks(void)
 {
-	toggle_led2();
+	LED_StateMachine();
 }
-
-/**************************************************************
- *  Name                 :  Task3_100ticks
- *  Description          :  Init function of Scheduler module
- *  Parameters           :  void
- *  Return               :  void
- *  Precondition         :  This function must be called after cpu initialization.
- *  Postcondition        :  Function gsc_sch_core_exec can be called.
- **************************************************************/
-void Task3_100ticks(void)
-{
-	toggle_led3();
-}
-
-/**************************************************************
- *  Name                 :  Task4_500ticks
- *  Description          :  Init function of Scheduler module
- *  Parameters           :  void
- *  Return               :  void
- *  Precondition         :  This function must be called after cpu initialization.
- *  Postcondition        :  Function gsc_sch_core_exec can be called.
- **************************************************************/
-void Task4_500ticks(void)
-{
-	toggle_led4();
-}
-
 
 /* Exported functions */
 /*============================================================================*/
