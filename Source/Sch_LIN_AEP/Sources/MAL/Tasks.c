@@ -34,6 +34,9 @@
 /*----------------------------------------------------------------------------*/
 /*   1.0 		|  	Nov/13/15		| 	  Added new tasks  	  |  Jorge Gomez  */
 /*============================================================================*/
+/*   1.1		|   Dic/03/15       |Unnecessary tasks were   |Jose Luis Mtz  */
+/*  			|					|		removed			  |	 	          */
+/*============================================================================*/
 /*                      				 		                              */
 /*============================================================================*/
 /*
@@ -62,6 +65,7 @@ const S_TASK cas_TaskList[NUMBER_OF_TASKS] =
 
 /* Variables */
 /*============================================================================*/
+T_UBYTE ruw_waint2In = 0;
 
 
 
@@ -84,7 +88,7 @@ const S_TASK cas_TaskList[NUMBER_OF_TASKS] =
  * */
 
  /**************************************************************
-  *  Name                 :  Task2_50ticks
+  *  Name                 :  Task1_50ticks
   *  Description          :  Init function of Scheduler module
   *  Parameters           :  void
   *  Return               :  void
@@ -93,7 +97,12 @@ const S_TASK cas_TaskList[NUMBER_OF_TASKS] =
   **************************************************************/
 void Task1_50ticks(void)
 {
+	ruw_waint2In++;
+	if(ruw_waint2In == 2)
+	{
 	toggle_led1();
+	ruw_waint2In = 1;
+	}
 }
 
 /* Exported functions */
