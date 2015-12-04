@@ -89,6 +89,8 @@ Link map of __startup
     3] .text.104 (notype,local) found in librt_E200z0_VLE_Soft.a D:\w\EPPC\workspace_codegen\ewl\EWL_Runtime\Runtime_PA_CmdLineData\librt_E200z0_VLE_Soft\obj\global_destructor_chain.o
     3] .text (section,local) found in librt_E200z0_VLE_Soft.a D:\w\EPPC\workspace_codegen\ewl\EWL_Runtime\Runtime_PA_CmdLineData\librt_E200z0_VLE_Soft\obj\runtime.o
     3] .text.205 (notype,local) found in librt_E200z0_VLE_Soft.a D:\w\EPPC\workspace_codegen\ewl\EWL_Runtime\Runtime_PA_CmdLineData\librt_E200z0_VLE_Soft\obj\runtime.o
+    3] .text (section,local) found in LIN_Slave4_c.obj 
+    3] .text.42 (notype,local) found in LIN_Slave4_c.obj 
 
 
 .__bam_bootarea section layout
@@ -180,6 +182,9 @@ Link map of __startup
   00000052 000050 00003052 00000702  2 INIT_Derivative 	MPC5606B_HWInit_c.obj 
   UNUSED   000002 ........ ........    INIT_ExternalBusAndMemory MPC5606B_HWInit_c.obj 
   000000a2 000000 000030a2 00000752  1 .text.13 	MPC5606B_HWInit_c.obj 
+  000000a2 000000 000030a2 00000752  1 .text 	LIN_Slave4_c.obj 
+  UNUSED   000092 ........ ........    LIN_Slv_StateMachine LIN_Slave4_c.obj 
+  000000a2 000000 000030a2 00000752  1 .text.42 	LIN_Slave4_c.obj 
   000000a2 000060 000030a2 00000752  1 .text 	BlinkingLedsApp_c.obj 
   000000a2 000018 000030a2 00000752  2 toggle_led1 	BlinkingLedsApp_c.obj 
   000000ba 000018 000030ba 0000076a  2 toggle_led2 	BlinkingLedsApp_c.obj 
@@ -469,12 +474,12 @@ Memory map:
                .sdata2 400003bc 00000000 00001000 00003800 00003800          0
                 .sbss2 400003bc 00000000 00001000 00003800 00003800          0
                   .bss 400003c0 00000010 00001000 00003800 00003800          0
-      .PPC.EMB.apuinfo 00006a38 00000000 00007a40 0000a238 0000a238          0
+      .PPC.EMB.apuinfo 00007078 00000000 00008080 0000a878 0000a878          0
          .debug_abbrev          0000014f 00001000
-           .debug_info          00001f2e 0000114f
-           .debug_line          0000314c 0000307d
-            .debug_loc          000004cf 000061c9
-       .debug_pubnames          0000054a 00006698
+           .debug_info          000020ce 0000114f
+           .debug_line          000035a6 0000321d
+            .debug_loc          000004cf 000067c3
+       .debug_pubnames          0000054a 00006c92
 
 
 Linker generated symbols:
