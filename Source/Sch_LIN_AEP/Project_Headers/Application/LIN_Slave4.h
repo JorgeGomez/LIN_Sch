@@ -40,6 +40,7 @@
 #include "HAL/MPC5606B.h"
 #include "HAL/stdtypedef.h"
 #include "HAL/LINflex.h"
+#include "Application/Slave_Actions.h"
 
 /*============================================================================*/
 

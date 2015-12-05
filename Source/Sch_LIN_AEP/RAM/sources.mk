@@ -87,6 +87,8 @@ C_DEPS_QUOTED :=
 # Every subdirectory with source files must be described here
 SUBDIRS := \
 Sources \
+Sources/MAL \
 Sources/HAL \
+Sources/Application \
 Project_Settings/Startup_Code \
 

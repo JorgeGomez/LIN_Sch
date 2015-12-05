@@ -49,6 +49,8 @@
 /*============================================================================*/
 #include "HAL/stdtypedef.h"
 #include "HAL/MainConfig.h"
+#include "HAL/LINflex.h"
+#include "Signaltypes.h"
 
 /* Constants and types */
 /*============================================================================*/
@@ -56,12 +58,13 @@
 
 /* Exported Variables */
 /*============================================================================*/
-
+PUBLIC_DATA T_SLV_STAT re_SlaveStatus;
+PUBLIC_DATA T_LEDSTAT re_LEDStatus;
 
 /* Exported functions prototypes */
 /*============================================================================*/
  PUBLIC_FCT void Slave_Actions (void);
- PUBLIC_FCT void LED_StateMachine(void);
+ 
 
 
 #endif /* Notice: the file ends with a blank new line to avoid compiler warnings */

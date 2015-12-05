@@ -43,6 +43,7 @@
 /*============================================================================*/
 #include "HAL/MainConfig.h"
 #include "MAL/Kernel.h"
+#include "HAL/LINflex.h"
 
 
 /* Constants and types  */
@@ -81,6 +82,7 @@ void main(void)
 {
 	init_system();
 	init_Sch_TimeCntrs();
+	init_LINflex_Slv();
 	
 	Sch_function_execution();	
 }
