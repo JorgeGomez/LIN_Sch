@@ -63,7 +63,7 @@ typedef enum
 #define MASTER_CMD_ALL 		0x0F   		/* ID: CF */ 
 #define MASTER_CMD_SLV4 	0x13  		/* ID: D3 */
 #define SLAVE4_RSP 			0x23       	/* ID: A3 */
-#define SLAVE4_ID 			0x09        /* ID: 73 */
+#define SLAVE4_ID 			0x33        /* ID: 73 */
 
 /*Get data bytes of the buffer*/
 #define GETBYTE_ID			((T_UBYTE)(LINFLEX_0.BIDR.B.ID))
@@ -73,9 +73,10 @@ typedef enum
 #define PUTBYTE_DATA0		(LINFLEX_0.BDRL.B.DATA0)
 #define PUTBYTE_DATA1		(LINFLEX_0.BDRL.B.DATA1)
 #define PUTBYTE_DATA2		(LINFLEX_0.BDRL.B.DATA2)
-#define PUTBYTE_DATA3		(LINFLEX_0.BDRM.B.DATA4)
-#define PUTBYTE_DATA4		(LINFLEX_0.BDRM.B.DATA5)
-#define PUTBYTE_DATA5		(LINFLEX_0.BDRM.B.DATA6)
+#define PUTBYTE_DATA3		(LINFLEX_0.BDRL.B.DATA3)
+#define PUTBYTE_DATA4		(LINFLEX_0.BDRM.B.DATA4)
+#define PUTBYTE_DATA5		(LINFLEX_0.BDRM.B.DATA5)
+#define PUTBYTE_DATA6		(LINFLEX_0.BDRM.B.DATA6)
 #define RESTART_LIN_STMCH	(LINFLEX_0.LINCR2.B.DDRQ = 1)
 /*============================================================================*/
 

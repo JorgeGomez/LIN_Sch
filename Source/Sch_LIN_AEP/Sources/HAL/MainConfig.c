@@ -58,7 +58,7 @@
 /* Variables */
 /*============================================================================*/
 T_BOOLEAN rbi_TickFlag = FALSE;
-T_UBYTE ruw_waint2In = 0;
+T_UBYTE ruw_waint2In = 1;
 
 /* Private functions prototypes */
 /*============================================================================*/
@@ -154,7 +154,8 @@ void config_Emb_IO(void)
   	SIU.PCR[LED_1].R = 0x200;
   	
   	/* Configure pad PB2 for AF1 func: LIN0TX */
-    SIU.PCR[18].B.ODE = 1;  
+    SIU.PCR[18].B.SRC = 1; 
+    SIU.PCR[18].B.OBE = 1;
     SIU.PCR[18].B.PA = 1; 
     
     SIU.PCR[19].B.IBE = 1;     /* Configure pad PB3 for LIN0RX */
@@ -234,12 +235,13 @@ void led_off(T_UBYTE lub_Ch)
  **************************************************************/
 void led_toggle(T_UBYTE lub_Ch)
 {
-	ruw_waint2In++;
+
 	if(ruw_waint2In == 2)
 	{
 		SIU.GPDO[lub_Ch].R ^= 1;
-		ruw_waint2In = 1;
+		ruw_waint2In = 0;
 	}
+	ruw_waint2In++;
 }
 
 /**************************************************************

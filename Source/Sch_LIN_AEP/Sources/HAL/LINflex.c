@@ -41,6 +41,7 @@
 
 /* Constants and types  */
 /*============================================================================*/
+#define KINETIS 0
 /*============================================================================*/
 
 /* Variables */
@@ -88,18 +89,14 @@ PRIVATE_FCT void init_Slave_mode(void)
 	/*----------------------------------------------------------------------------------*/
 	LINFLEX_0.LINCR1.B.SLEEP  = 0;
 	LINFLEX_0.LINCR1.B.INIT  = 1;     /* Put LINFlex hardware in initialization mode     */    
-//	while(LINFLEX_0.LINSR.B.LINS != 1)
-//	{
-//		/*Wait for INIT state*/
-//	} 
-	
+
 	/*----------------------------------------------------------------------------------*/
 	/*								Slave Configuration 								*/
 	/*----------------------------------------------------------------------------------*/
 	
 	LINFLEX_0.UARTCR.B.UART = 0;	  /* UART working on LIN mode                       */
 	LINFLEX_0.LINCR1.B.MBL   = 0x03;  /* LIN Master Break Length: 13 bits               */ 
-	LINFLEX_0.LINCR1.B.BF    = 1;     /* Bypass Filter: Enabled                         */ 
+	LINFLEX_0.LINCR1.B.BF    = 0;     /* Bypass Filter: Enabled                         */ 
 	LINFLEX_0.LINCR1.B.MME   = 0;     /* Master Mode Enable: Slave                      */    
 	LINFLEX_0.LINCR1.B.SBDT  = 0;     /* Slave Mode Break Detection Threshold:  11 bits */
 	LINFLEX_0.LINCR1.B.RBLM  = 0;     /* Receive Buffer: Not Locked on overrun          */
@@ -111,14 +108,19 @@ PRIVATE_FCT void init_Slave_mode(void)
 	/*								Error Detection Configuration						*/
 	/*----------------------------------------------------------------------------------*/
 	
-	//LINFLEX_0.LINCR2.B.IOBE = 1; /*Idle on bit error: Disabled, Bit error does not reset state machine*/
-	
+	LINFLEX_0.LINCR2.B.IOBE = 0; /*Idle on bit error: Disabled, Bit error does not reset state machine*/
+	LINFLEX_0.LINTCSR.B.IOT = 0;
+	/*	
+	 * LINFLEX_0.LINIER.B.CEIE = 1;	
+	 * LINFLEX_0.LINIER.B.HEIE = 1;	
+	 * LINFLEX_0.LINIER.B.BEIE = 0;	ERRors
+	*/
 	/*----------------------------------------------------------------------------------*/
 	/*								Interrupt Configuration								*/
 	/*----------------------------------------------------------------------------------*/
 	
-	//LINFLEX_0.LINIER.B.DTIE  = 1;  /*Interruption generated when data transmitted flag (DTF) is set in LINSR or UARTSR.                      */
-	//LINFLEX_0.LINIER.B.HRIE  = 1;  /*Interrupt generated when a valid LIN header has been received, that is, HRF bit in LINSR is set.        */
+	LINFLEX_0.LINIER.B.DTIE  = 1;  /*Interruption generated when data transmitted flag (DTF) is set in LINSR or UARTSR.                      */
+	LINFLEX_0.LINIER.B.HRIE  = 1;  /*Interrupt generated when a valid LIN header has been received, that is, HRF bit in LINSR is set.        */
 	LINFLEX_0.LINIER.B.DRIE  = 1;  /*Interruption generated when data received flag (DRF) in LINSR or UARTSR is set.                         */
 	
 }
@@ -136,12 +138,20 @@ PRIVATE_FCT void Set_baudrate(void)
 {
 	/* LFDIV = Mantissa + (Fractional/16)
 	 * Tx/Rx_baud = (fperiph_set_1_clk /(16 × LFDIV)  with 0.01% Error  */
-
-	LINFLEX_0.LINIBRR.R = 208;/* Mantissa 	= 208*/
-	LINFLEX_0.LINFBRR.R = 5;  /* Fractional = 5 */
-	
+#if(KINETIS) 
+//	LINFLEX_0.LINIBRR.R = 208;/* Mantissa 	= 208*/
+//	LINFLEX_0.LINFBRR.R = 5;  /* Fractional = 5 */
+	LINFLEX_0.LINIBRR.R = 416;	/* Mantissa   = 416           br= 9600*/ 
+	LINFLEX_0.LINFBRR.R = 11;  	/* Fractional = 11 */
+#endif
 	/* LFDIV = 208 + (5/16) = 208.3125
 	 * Tx/Rx_baud = (64000000 /(16 × 208.3125) = 19201.9 with 0.01% Error  */
+	
+#if(KINETIS == 0) /*9600*/
+	LINFLEX_0.LINIBRR.R = 416;	/* Mantissa   = 416*/
+	LINFLEX_0.LINFBRR.R = 11;  	/* Fractional = 11 */
+#endif
+
 }
 
 
@@ -155,9 +165,9 @@ PRIVATE_FCT void Set_baudrate(void)
  **************************************************************/
 PRIVATE_FCT void init_LINflex_filter_submode(void)
 {
-	LINFLEX_0.IFER.R = 0x0000;  /*Deactivate filters 0 to 3 */
+	LINFLEX_0.IFER.R = 0x0000;  /*Deactivates filters 0 to 3 */
 	LINFLEX_0.IFMR.R = 0x0000;  /*Filters in list mode */
-	LINFLEX_0.IFER.R = 0x0003;
+	LINFLEX_0.IFER.R = 0x000F;	/*Activates filters 0 to 3 */
 }	
 
 
@@ -181,31 +191,52 @@ PRIVATE_FCT void init_ID_list(void)
 	/*|_________________|_______|_______|_______|____________|*/
 	/*Configure the filters*/
 	
-	/*MASTER_CMD_ALL*/
-	LINFLEX_0.IFCR[0].B.ID = 0x0F;
-	LINFLEX_0.IFCR[0].B.DIR = 0;
+	/*SLAVE4_RSP*/
+	LINFLEX_0.IFCR[0].B.ID = 0x23;
+	LINFLEX_0.IFCR[0].B.DIR = 1;
+#if(KINETIS)
 	LINFLEX_0.IFCR[0].B.CCS = 0;
-	LINFLEX_0.IFCR[0].B.DFL = 0;
+#endif
+#if(KINETIS == 0)
+	LINFLEX_0.IFCR[0].B.CCS = 1;
+#endif
+	LINFLEX_0.IFCR[0].B.DFL = 1;
 	
-	/*MASTER_CMD_SLV4*/
-	LINFLEX_0.IFCR[1].B.ID = 0x13;
+	/*MASTER_CMD_ALL*/
+	LINFLEX_0.IFCR[1].B.ID = 0x0F;
 	LINFLEX_0.IFCR[1].B.DIR = 0;
+#if(KINETIS)
 	LINFLEX_0.IFCR[1].B.CCS = 0;
+#endif
+#if(KINETIS == 0)
+	LINFLEX_0.IFCR[1].B.CCS = 1;
+#endif
 	LINFLEX_0.IFCR[1].B.DFL = 0;
 	
-	/*SLAVE4_RSP*/
-	LINFLEX_0.IFCR[2].B.ID = 0x33;
-	LINFLEX_0.IFCR[2].B.DIR = 1;
-	LINFLEX_0.IFCR[2].B.CCS = 0;
-	LINFLEX_0.IFCR[2].B.DFL = 1;
 	
 	/*SLAVE4_ID*/
-	LINFLEX_0.IFCR[3].B.ID = 0x33;
-	LINFLEX_0.IFCR[3].B.DIR = 1;
+	LINFLEX_0.IFCR[2].B.ID = 0x33;
+	LINFLEX_0.IFCR[2].B.DIR = 1;
+#if(KINETIS)
+	LINFLEX_0.IFCR[2].B.CCS = 0;
+#endif
+#if(KINETIS == 0)
+	LINFLEX_0.IFCR[2].B.CCS = 1;
+#endif
+	LINFLEX_0.IFCR[2].B.DFL = 6;
+	
+	
+	/*MASTER_CMD_SLV4*/
+	LINFLEX_0.IFCR[3].B.ID = 0x13;
+	LINFLEX_0.IFCR[3].B.DIR = 0;
+#if(KINETIS)
 	LINFLEX_0.IFCR[3].B.CCS = 0;
-	LINFLEX_0.IFCR[3].B.DFL = 6;
-
-	LINFLEX_0.IFER.R = 0x0003;  /*Activate filters 0 to 3 */
+#endif
+#if(KINETIS == 0)
+	LINFLEX_0.IFCR[3].B.CCS = 1;
+#endif
+	LINFLEX_0.IFCR[3].B.DFL = 0;
+	
 }
 
 
@@ -223,15 +254,14 @@ PRIVATE_FCT void init_LIN_handlers(void)
 	/*								Start the normal mode								*/
 	/*----------------------------------------------------------------------------------*/
 	LINFLEX_0.LINCR1.B.INIT = 0; 	/*Change LINflex to operational mode*/
-//	while(LINFLEX_0.LINSR.B.LINS != 2)
-//	{
-//		/*Wait for IDLE state*/
-//	}
-	
-	INTC_InstallINTCInterruptHandler(Rx_ISR, 79, 2);
-	INTC_InstallINTCInterruptHandler(Tx_ISR, 80, 3);
+
+	INTC_InstallINTCInterruptHandler(&Rx_ISR, 79, 2);
+	INTC_InstallINTCInterruptHandler(&Tx_ISR, 80, 3);
 	//INTC_InstallINTCInterruptHandler(Error_ISR, 81, 4);
 	INTC.CPR.R = 0x0;
+
+
+
 }
 
 
@@ -273,9 +303,9 @@ void Rx_ISR(void)
 	
 	rub_Rx_ID = 0;
 	
-	//LINFLEX_0.LINSR.B.DRF = 1;
+	LINFLEX_0.LINSR.B.DRF = 1;
 	LINFLEX_0.LINSR.B.HRF = 1;
-	//LINFLEX_0.LINSR.B.RMB = 1;
+	LINFLEX_0.LINSR.B.RMB = 1;
 }
 
 
@@ -289,17 +319,24 @@ void Rx_ISR(void)
  **************************************************************/
 void Tx_ISR(void)
 {
-	//LINFLEX_0.BIDR.B.DIR = 0; /* BDR direction - write */
-	LIN_Slv_StateMachine(TX_INTERRUPT);
-	
-	LIN_Slv_StateMachine(TX_INTERRUPT);
-	
+	//T_ULONG status = LINFLEX_0.LINSR.R;
+	rub_Rx_ID = GETBYTE_ID;
+	if(LINFLEX_0.LINSR.B.HRF)
+	{
+		LINFLEX_0.BIDR.B.DIR = 1; /* BDR direction - write */
+
+		LIN_Slv_StateMachine(TX_INTERRUPT);
+		LIN_Slv_StateMachine(TX_INTERRUPT);
+
+		//			LINFLEX_0.LINSR.B.HRF = 0x1;
+		//			LINFLEX_0.LINCR2.B.DTRQ = 1;
+		LINFLEX_0.LINSR.B.HRF = 1;
+	}
+	else if(LINFLEX_0.LINSR.B.DTF)
+	{
+		LINFLEX_0.LINSR.B.DTF = 1;
+	}
 	rub_Rx_ID = 0;
-	
-	LINFLEX_0.LINCR2.B.DTRQ = 1;
-	LINFLEX_0.LINSR.B.HRF = 1;
-	LINFLEX_0.LINSR.B.DTF = 1;
-	
 
 }
 
