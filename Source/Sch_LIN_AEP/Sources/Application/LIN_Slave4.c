@@ -99,7 +99,7 @@ void LIN_Slv_StateMachine(E_INTERRUPT_EVNT le_event)
 		case RX_ID:
 				if((rub_Rx_ID == MASTER_CMD_ALL) || (rub_Rx_ID == MASTER_CMD_SLV4))
 				{
-					re_SlvCmd = GETBYTE_DATA0 & 0x07;
+					re_SlvCmd = GETBYTE_DATA0 & 0x0F;
 					re_SlvState = IDLE; 
 				}
 				else

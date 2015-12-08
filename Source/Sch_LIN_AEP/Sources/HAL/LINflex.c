@@ -41,7 +41,7 @@
 
 /* Constants and types  */
 /*============================================================================*/
-#define KINETIS 1
+#define KINETIS 0
 /*============================================================================*/
 
 /* Variables */
@@ -272,11 +272,11 @@ PRIVATE_FCT void init_LIN_handlers(void)
  **************************************************************/
 void init_LINflex_Slv(void)
 {
-	init_Slave_mode();
-	Set_baudrate();
-	init_LINflex_filter_submode();
-	init_ID_list();
-	init_LIN_handlers();
+	init_Slave_mode(); 				/*Initializes the lin flex in slave mode*/
+	Set_baudrate();					/*Sets the Linflex baudrate*/
+	init_LINflex_filter_submode();	/*Initializes the filter mode*/
+	init_ID_list();					/*Initiliazes the ID list*/
+	init_LIN_handlers();			/*Initializes the ISR handlers for Tx and Rx*/
 }
 
 /**************************************************************
@@ -322,8 +322,6 @@ void Tx_ISR(void)
 		LIN_Slv_StateMachine(TX_INTERRUPT);
 		LIN_Slv_StateMachine(TX_INTERRUPT);
 
-		//			LINFLEX_0.LINSR.B.HRF = 0x1;
-		//			LINFLEX_0.LINCR2.B.DTRQ = 1;
 		LINFLEX_0.LINSR.B.HRF = 1;
 	}
 	else if(LINFLEX_0.LINSR.B.DTF)
