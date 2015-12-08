@@ -41,56 +41,28 @@
 #include "HAL/MPC5606B.h"
 #include "HAL/stdtypedef.h"
 #include "Application/LIN_Slave4.h"
+#include "Signaltypes.h"
+
 
 /*============================================================================*/
 
 /* Constants and types */
 /*============================================================================*/
 
-typedef enum
-{
-	DISABLED,
-	ENABLED
-}T_SLV_STAT;
 
-typedef enum
-{
-	cmd_NONE,
-	cmd_LED_on,
-	cmd_LED_off,
-	cmd_LED_toggling,
-	cmd_disable_slv,
-	cmd_enable_slv
-}T_CMDTYPE;
-
-typedef enum
-{
-	OFF,
-	ON,
-	TOGGLING
-}T_LEDSTAT;
-
-
-typedef T_UBYTE T_SCALAR;
-
-typedef struct{
-	T_UBYTE e[6];
-} T_ARRAY;
 
 /*============================================================================*/
 
 /* Exported Variables */
 /*============================================================================*/
 /*============================================================================*/
-PUBLIC_DATA T_UBYTE		rub_RxID;			/*Variable for Received ID      */
+PUBLIC_DATA T_UBYTE		rub_Rx_ID;			/*Variable for Received ID      */
 PUBLIC_DATA T_CMDTYPE	re_SlvCmd;	/*Variable for Received Command */
 
 /* Exported functions prototypes */
 /*============================================================================*/
 PUBLIC_FCT void init_LINflex_Slv(void);
-PUBLIC_FCT void Rx_ISR(void);
-PUBLIC_FCT void Tx_ISR(void);
-PUBLIC_FCT void Error_ISR(void);
+
 /*============================================================================*/
 
 #endif /* LINFLEX_H_ */

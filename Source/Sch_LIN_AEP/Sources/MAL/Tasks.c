@@ -96,7 +96,7 @@ const S_TASK cas_TaskList[NUMBER_OF_TASKS] =
   **************************************************************/
 void Task1_50ticks(void)
 {
-	LED_StateMachine();
+	Slave_Actions();
 }
 
 /* Exported functions */

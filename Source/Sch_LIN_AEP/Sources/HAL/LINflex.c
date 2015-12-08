@@ -41,6 +41,7 @@
 
 /* Constants and types  */
 /*============================================================================*/
+#define KINETIS 0
 /*============================================================================*/
 
 /* Variables */
@@ -54,7 +55,17 @@ T_UBYTE 	rub_status_lin = 0;
 
 /* Private functions prototypes */
 /*============================================================================*/
+PRIVATE_FCT void Rx_ISR(void);
+PRIVATE_FCT void Tx_ISR(void);
+PRIVATE_FCT void Error_ISR(void);
+PRIVATE_FCT void init_Slave_mode(void);
+PRIVATE_FCT void Set_baudrate(void);
+PRIVATE_FCT void init_LINflex_filter_submode(void);
+PRIVATE_FCT void init_ID_list(void);
+PRIVATE_FCT void init_LIN_handlers(void);
 /*============================================================================*/
+
+
 
 /* Inline functions */
 /*============================================================================*/
@@ -62,47 +73,48 @@ T_UBYTE 	rub_status_lin = 0;
 
 /* Private functions */
 /*============================================================================*/
-/*============================================================================*/
 
 /**************************************************************
- *  Name                 :  Rx_ISR
- *  Description          :  Check LINFlex Rx flag and Transfer Data
+ *  Name                 :  init_Slave_mode
+ *  Description          :  Starts the slave mode configuration
  *  Parameters           :  void
  *  Return               :  void
- *  Precondition         :  And Rx interrupt must occur.
- *  Postcondition        :  Get the data on the buffer.
+ *  Precondition         :  The correct initialization of the startup code..
+ *  Postcondition        :  Set on init mode the LINflex.
  **************************************************************/
 PRIVATE_FCT void init_Slave_mode(void) 
 {
 	/*----------------------------------------------------------------------------------*/
 	/*								Start Configuration									*/
 	/*----------------------------------------------------------------------------------*/
+	LINFLEX_0.LINCR1.B.SLEEP  = 0;
 	LINFLEX_0.LINCR1.B.INIT  = 1;     /* Put LINFlex hardware in initialization mode     */    
-	while(LINFLEX_0.LINSR.B.LINS != 1)
-	{
-		/*Wait for INIT state*/
-	} 
-	
+
 	/*----------------------------------------------------------------------------------*/
 	/*								Slave Configuration 								*/
 	/*----------------------------------------------------------------------------------*/
 	
 	LINFLEX_0.UARTCR.B.UART = 0;	  /* UART working on LIN mode                       */
 	LINFLEX_0.LINCR1.B.MBL   = 0x03;  /* LIN Master Break Length: 13 bits               */ 
-	LINFLEX_0.LINCR1.B.BF    = 1;     /* Bypass Filter: Enabled                         */ 
+	LINFLEX_0.LINCR1.B.BF    = 0;     /* Bypass Filter: Enabled                         */ 
 	LINFLEX_0.LINCR1.B.MME   = 0;     /* Master Mode Enable: Slave                      */    
 	LINFLEX_0.LINCR1.B.SBDT  = 0;     /* Slave Mode Break Detection Threshold:  11 bits */
 	LINFLEX_0.LINCR1.B.RBLM  = 0;     /* Receive Buffer: Not Locked on overrun          */
 	LINFLEX_0.LINCR1.B.CCD   = 0;     /* Checksum Calculation is done by hardware.      */
 	LINFLEX_0.LINCR1.B.CFD   = 0;     /* Checksum field: Enabled                        */ 
-	LINFLEX_0.LINCR1.B.LASE  = 1;     /* LIN Slave Automatic Resynchronization: disabled*/
+	LINFLEX_0.LINCR1.B.LASE  = 1;     /* LIN Slave Automatic Resynchronization: enabled */
 	
 	/*----------------------------------------------------------------------------------*/
 	/*								Error Detection Configuration						*/
 	/*----------------------------------------------------------------------------------*/
 	
-	LINFLEX_0.LINCR2.B.IOBE = 1; /*Idle on bit error: Disabled, Bit error does not reset state machine*/
-	
+	LINFLEX_0.LINCR2.B.IOBE = 0; /*Idle on bit error: Disabled, Bit error does not reset state machine*/
+	LINFLEX_0.LINTCSR.B.IOT = 0;
+	/*	
+	 * LINFLEX_0.LINIER.B.CEIE = 1;	
+	 * LINFLEX_0.LINIER.B.HEIE = 1;	
+	 * LINFLEX_0.LINIER.B.BEIE = 0;	ERRors
+	*/
 	/*----------------------------------------------------------------------------------*/
 	/*								Interrupt Configuration								*/
 	/*----------------------------------------------------------------------------------*/
@@ -115,68 +127,117 @@ PRIVATE_FCT void init_Slave_mode(void)
 
 
 /**************************************************************
- *  Name                 :  Rx_ISR
- *  Description          :  Check LINFlex Rx flag and Transfer Data
+ *  Name                 :  Set_baudrate
+ *  Description          :  Sets the baudrate
  *  Parameters           :  void
  *  Return               :  void
- *  Precondition         :  And Rx interrupt must occur.
- *  Postcondition        :  Get the data on the buffer.
+ *  Precondition         :  The linflex must be on init mode.
+ *  Postcondition        :  The baud rate is setted.
+ *  Req					 :				
  **************************************************************/
 PRIVATE_FCT void Set_baudrate(void)
 {
 	/* LFDIV = Mantissa + (Fractional/16)
-	 * Tx/Rx_baud = (fperiph_set_1_clk /(16 × LFDIV)  with 0.01% Error  */
+	 * Tx/Rx_baud = (fperiph_set_1_clk /(16 × LFDIV)  */
+	LINFLEX_0.LINIBRR.R = 416;	/* Mantissa   = 416           br= 9600*/ 
+	LINFLEX_0.LINFBRR.R = 11;  	/* Fractional = 11 */
 
-	LINFLEX_0.LINIBRR.R = 208;/* Mantissa 	= 208*/
-	LINFLEX_0.LINFBRR.R = 5;  /* Fractional = 5 */
-	
-	/* LFDIV = 208 + (5/16) = 208.3125
-	 * Tx/Rx_baud = (64000000 /(16 × 208.3125) = 19201.9 with 0.01% Error  */
+	/* LFDIV = 416 + (11/16) = 416.6875
+	 * Tx/Rx_baud = (64000000 /(16 × 416.6875) = 9599.52 with 0.005% Error  */
 }
 
 
 /**************************************************************
- *  Name                 :  Rx_ISR
- *  Description          :  Check LINFlex Rx flag and Transfer Data
+ *  Name                 :  init_LINflex_filter_submode
+ *  Description          :  Initializes the filter submode
  *  Parameters           :  void
  *  Return               :  void
- *  Precondition         :  And Rx interrupt must occur.
- *  Postcondition        :  Get the data on the buffer.
+ *  Precondition         :  The linflex must be on init mode.
+ *  Postcondition        :  Initialize the filter submode.
  **************************************************************/
 PRIVATE_FCT void init_LINflex_filter_submode(void)
 {
-	LINFLEX_0.IFER.R = 0x0003;  /*Activate filters 0 to 3 */
+	LINFLEX_0.IFER.R = 0x0000;  /*Deactivates filters 0 to 3 */
 	LINFLEX_0.IFMR.R = 0x0000;  /*Filters in list mode */
+	LINFLEX_0.IFER.R = 0xF;	/*Activates filters 0 to 3 */
 }	
 
 
 /**************************************************************
  *  Name                 :  Rx_ISR
- *  Description          :  Check LINFlex Rx flag and Transfer Data
+ *  Description          :  Initializes the filter list
  *  Parameters           :  void
  *  Return               :  void
- *  Precondition         :  And Rx interrupt must occur.
+ *  Precondition         :  The linflex must be on init mode.
  *  Postcondition        :  Get the data on the buffer.
  **************************************************************/
 PRIVATE_FCT void init_ID_list(void)
 {
-	/*--------------------------------------------------------*/
-	/*Configure the filters*/		/*| Name:			|	Dir	|	Len	|	ID	|	Chksum	 |*/
-									/*|-----------------|-------|-------|-------|------------|*/
-	LINFLEX_0.IFCR[0].R = 0x010F; 	/*| MASTER_CMD_ALL,	|	RX,	|	1,	|	CF,	|	Enhanced |*/
-	LINFLEX_0.IFCR[1].R = 0x0413; 	/*| MASTER_CMD_SLV4,|	RX,	|	1,	|	D3,	|	Enhanced |*/
-	LINFLEX_0.IFCR[2].R = 0x0A23;	/*| SLAVE4_RSP,		|	TX,	|	2,	|	A3,	|	Enhanced |*/
-	LINFLEX_0.IFCR[3].R = 0x1E09;	/*| SLAVE4_ID,		|	TX,	|	7,	|	73,	|	Enhanced |*/
-									/*--------------------------------------------------------*/
+	/* ______________________________________________________ */
+	/*| Name:			|	Dir	|	Len	|	ID	|	Chksum	 |*/
+	/*|_________________|_______|_______|_______|____________|*/
+	/*| MASTER_CMD_ALL,	|	RX,	|	1,	|	CF,	|	Enhanced |*/
+	/*| MASTER_CMD_SLV4,|	RX,	|	1,	|	D3,	|	Enhanced |*/
+	/*| SLAVE4_RSP,		|	TX,	|	2,	|	A3,	|	Enhanced |*/
+	/*| SLAVE4_ID,		|	TX,	|	7,	|	73,	|	Enhanced |*/
+	/*|_________________|_______|_______|_______|____________|*/
+	/*Configure the filters*/
+	
+	/*SLAVE4_RSP*/
+	LINFLEX_0.IFCR[0].B.ID = 0x23;
+	LINFLEX_0.IFCR[0].B.DIR = 1;
+#if(KINETIS)
+	LINFLEX_0.IFCR[0].B.CCS = 0;
+#endif
+#if(KINETIS == 0)
+	LINFLEX_0.IFCR[0].B.CCS = 1;
+#endif
+	LINFLEX_0.IFCR[0].B.DFL = 1;
+	
+	/*MASTER_CMD_ALL*/
+	LINFLEX_0.IFCR[1].B.ID = 0x0F;
+	LINFLEX_0.IFCR[1].B.DIR = 0;
+#if(KINETIS)
+	LINFLEX_0.IFCR[1].B.CCS = 0;
+#endif
+#if(KINETIS == 0)
+	LINFLEX_0.IFCR[1].B.CCS = 1;
+#endif
+	LINFLEX_0.IFCR[1].B.DFL = 0;
+	
+	
+	/*SLAVE4_ID*/
+	LINFLEX_0.IFCR[2].B.ID = 0x33;
+	LINFLEX_0.IFCR[2].B.DIR = 1;
+#if(KINETIS)
+	LINFLEX_0.IFCR[2].B.CCS = 0;
+#endif
+#if(KINETIS == 0)
+	LINFLEX_0.IFCR[2].B.CCS = 1;
+#endif
+	LINFLEX_0.IFCR[2].B.DFL = 6;
+	
+	
+	/*MASTER_CMD_SLV4*/
+	LINFLEX_0.IFCR[3].B.ID = 0x13;
+	LINFLEX_0.IFCR[3].B.DIR = 0;
+#if(KINETIS)
+	LINFLEX_0.IFCR[3].B.CCS = 0;
+#endif
+#if(KINETIS == 0)
+	LINFLEX_0.IFCR[3].B.CCS = 1;
+#endif
+	LINFLEX_0.IFCR[3].B.DFL = 0;
+	
 }
 
 
 /**************************************************************
- *  Name                 :  Rx_ISR
- *  Description          :  Check LINFlex Rx flag and Transfer Data
+ *  Name                 :  init_LIN_handlers
+ *  Description          :  Init the interrupts
  *  Parameters           :  void
  *  Return               :  void
- *  Precondition         :  And Rx interrupt must occur.
+ *  Precondition         :  The linflex must be on init mode.
  *  Postcondition        :  Get the data on the buffer.
  **************************************************************/
 PRIVATE_FCT void init_LIN_handlers(void)
@@ -185,36 +246,37 @@ PRIVATE_FCT void init_LIN_handlers(void)
 	/*								Start the normal mode								*/
 	/*----------------------------------------------------------------------------------*/
 	LINFLEX_0.LINCR1.B.INIT = 0; 	/*Change LINflex to operational mode*/
-	while(LINFLEX_0.LINSR.B.LINS != 2)
-	{
-		/*Wait for IDLE state*/
-	}
-	
-	INTC_InstallINTCInterruptHandler(Rx_ISR, 79, 2);
-	INTC_InstallINTCInterruptHandler(Tx_ISR, 80, 3);
+
+	INTC_InstallINTCInterruptHandler(&Rx_ISR, 79, 2);
+	INTC_InstallINTCInterruptHandler(&Tx_ISR, 80, 3);
 	//INTC_InstallINTCInterruptHandler(Error_ISR, 81, 4);
 	INTC.CPR.R = 0x0;
-}
 
+
+
+}
+/*============================================================================*/
 
 /* Exported functions */
 /*============================================================================*/
 
 /**************************************************************
  *  Name                 :  init_LINflex_Slv
- *  Description          :  Init the Linflex
+ *  Description          :  Init the Linflex in general
  *  Parameters           :  void
  *  Return               :  void
  *  Precondition         :  The correct initialization of the startup code.
  *  Postcondition        :  The LINflex module is enable to work with the ID’s for slave 4.
+ *  SW design			 :	5.4
+ *  Req. 				 :	4.0 to 4.15 and 7.13
  **************************************************************/
 void init_LINflex_Slv(void)
 {
-	init_Slave_mode();
-	Set_baudrate();
-	init_LINflex_filter_submode();
-	init_ID_list();
-	init_LIN_handlers();
+	init_Slave_mode(); 				/*Initializes the lin flex in slave mode*/
+	Set_baudrate();					/*Sets the Linflex baudrate*/
+	init_LINflex_filter_submode();	/*Initializes the filter mode*/
+	init_ID_list();					/*Initiliazes the ID list*/
+	init_LIN_handlers();			/*Initializes the ISR handlers for Tx and Rx*/
 }
 
 /**************************************************************
@@ -233,7 +295,7 @@ void Rx_ISR(void)
 	
 	LIN_Slv_StateMachine(RX_INTERRUPT);
 	
-	rub_RxID = 0;
+	rub_Rx_ID = 0;
 	
 	LINFLEX_0.LINSR.B.DRF = 1;
 	LINFLEX_0.LINSR.B.HRF = 1;
@@ -251,15 +313,22 @@ void Rx_ISR(void)
  **************************************************************/
 void Tx_ISR(void)
 {
-	//LINFLEX_0.BIDR.B.DIR = 0; /* BDR direction - write */
-	LIN_Slv_StateMachine(RX_INTERRUPT);
 	
-	LIN_Slv_StateMachine(RX_INTERRUPT);
-	
-	LINFLEX_0.LINCR2.B.DTRQ = 1;
-	LINFLEX_0.LINSR.B.HRF = 1;
-	LINFLEX_0.LINSR.B.DTF = 1;
-	
+	rub_Rx_ID = GETBYTE_ID;
+	if(LINFLEX_0.LINSR.B.HRF)
+	{
+		LINFLEX_0.BIDR.B.DIR = 1; /* BDR direction - write */
+
+		LIN_Slv_StateMachine(TX_INTERRUPT);
+		LIN_Slv_StateMachine(TX_INTERRUPT);
+
+		LINFLEX_0.LINSR.B.HRF = 1;
+	}
+	else if(LINFLEX_0.LINSR.B.DTF)
+	{
+		LINFLEX_0.LINSR.B.DTF = 1;
+	}
+	rub_Rx_ID = 0;
 
 }
 

@@ -58,7 +58,7 @@
 /* Variables */
 /*============================================================================*/
 T_BOOLEAN rbi_TickFlag = FALSE;
-T_UBYTE ruw_waint2In = 0;
+T_UBYTE ruw_waint2In = 1;
 
 /* Private functions prototypes */
 /*============================================================================*/
@@ -97,7 +97,8 @@ void init_modes_and_clocks(void)
 	ME.RUN[0].R = 0x001F0074;       	/* RUN0 cfg: 16MHzIRCON,OSC0ON,PLL0ON,syclk=PLL0 */
 	ME.RUNPC[1].R = 0x00000010; 	  	/* Peri. Cfg. 1 settings: only run in RUN0 mode */
   	ME.PCTL[68].R = 0x01; 	    		/*MPC56xxB/S SIU: select ME.RUNPC[1] */  
-  	ME.PCTL[92].R = 0x01; 	      		/* MPC56xxB/S PIT: select ME.RUNPC[1] */	
+  	ME.PCTL[92].R = 0x01; 	      		/* MPC56xxB/S PIT: select ME.RUNPC[1] */
+  	ME.PCTL[48].R = 0x01; 	      		/* MPC56xxB/S LINflex_0: select ME.RUNPC[1] */
   	
   	/* Mode Transition to enter RUN0 mode: */
   	ME.MCTL.R = 0x40005AF0;         /* Enter RUN0 Mode & Key */
@@ -134,7 +135,9 @@ void disableWatchdog(void)
 void initPeriClkGen(void) 
 {
 	/* Use the following code as required for MPC56xxB or MPC56xxS:*/
-  	CGM.SC_DC2.R = 0x80;   /* MPC56xxB/S: Enable peri set 3 sysclk divided by 1  omg */
+	CGM.SC_DC0.R = 0x80;
+  	CGM.SC_DC1.R = 0x80;   /* MPC56xxB/S: Enable peri set 3 sysclk divided by 1 */
+  	CGM.SC_DC2.R = 0x80;   
 }
 
 /**************************************************************
@@ -149,13 +152,16 @@ void config_Emb_IO(void)
 {
   	/* led is seted as outputs */
   	SIU.PCR[LED_1].R = 0x200;
-  		
-  	/* Embedded board buttons are seted as inputs */
-//  	SIU.PCR[PUSHB_1].R = 0x100;	
-//  	SIU.PCR[PUSHB_2].R = 0x100;
+  	
+  	/* Configure pad PB2 for AF1 func: LIN0TX */
+    SIU.PCR[18].B.SRC = 1; 
+    SIU.PCR[18].B.OBE = 1;
+    SIU.PCR[18].B.PA = 1; 
+    
+    SIU.PCR[19].B.IBE = 1;     /* Configure pad PB3 for LIN0RX */
 
   	/* led init led in off */
-	SIU.GPDO[LED_1].R = OFF;
+	SIU.GPDO[LED_1].R = ON;
 
 } 
 
@@ -171,6 +177,7 @@ void config_Emb_IO(void)
  *  Return               :  void
  *  Precondition         :  This function must be called after correct startup.
  *  Postcondition        :  All the cpu and the peripherials are initialized.
+ *  SW design			 :	5.2
  **************************************************************/
 void init_system(void)
 {
@@ -229,13 +236,13 @@ void led_off(T_UBYTE lub_Ch)
  **************************************************************/
 void led_toggle(T_UBYTE lub_Ch)
 {
+
+	if(ruw_waint2In == 2)
+	{
+		SIU.GPDO[lub_Ch].R ^= 1;
+		ruw_waint2In = 0;
+	}
 	ruw_waint2In++;
-	    	  if(ruw_waint2In == 2)
-	    	     {
-	    	     led_toggle(LED_1);
-	    	     ruw_waint2In = 1;
-	    	     }
-	SIU.GPDO[lub_Ch].R ^= 1;
 }
 
 /**************************************************************
