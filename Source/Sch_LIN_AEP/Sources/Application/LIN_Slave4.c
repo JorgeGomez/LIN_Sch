@@ -72,6 +72,8 @@ E_LIN_STATES re_SlvState = IDLE;
  *  Return               :  void
  *  Precondition         :  An interrupt must occur.
  *  Postcondition        :  Acquires the data of LIN.
+ *  Req. 				 :	4.3, 4.7, 4.11 and 4.15
+ *  SW design			 :	5.5
  **************************************************************/
 void LIN_Slv_StateMachine(E_INTERRUPT_EVNT le_event) 
 {

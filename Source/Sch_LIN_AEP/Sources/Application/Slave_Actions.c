@@ -79,6 +79,8 @@ PRIVATE_FCT void LED_StateMachine(T_CMDTYPE le_slvcmd);
 *  Return               :  void
 *  Precondition         :  The periodic task is called
 *  Postcondition        :  The slave change its status
+*  Req. 				:  7.3 and 7.7 to 7.9
+*  SW design			:  5.6
 **************************************************************/
 void Slave_Actions(void)
 {
@@ -116,6 +118,8 @@ void Slave_Actions(void)
 *  Return               :  void
 *  Precondition         :  The periodic task is called
 *  Postcondition        :  Switch the status of the LED
+*  Req.					:  7.4 to 7.6 and 7.10 to 7.12
+*  SW design			:  5.7
 **************************************************************/
 PRIVATE_FCT void LED_StateMachine(T_CMDTYPE le_slvcmd)
 {

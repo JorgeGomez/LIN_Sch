@@ -177,6 +177,7 @@ void config_Emb_IO(void)
  *  Return               :  void
  *  Precondition         :  This function must be called after correct startup.
  *  Postcondition        :  All the cpu and the peripherials are initialized.
+ *  SW design			 :	5.2
  **************************************************************/
 void init_system(void)
 {

@@ -41,7 +41,7 @@
 
 /* Constants and types  */
 /*============================================================================*/
-#define KINETIS 0
+#define KINETIS 1
 /*============================================================================*/
 
 /* Variables */
@@ -55,7 +55,6 @@ T_UBYTE 	rub_status_lin = 0;
 
 /* Private functions prototypes */
 /*============================================================================*/
-/*============================================================================*/
 PRIVATE_FCT void Rx_ISR(void);
 PRIVATE_FCT void Tx_ISR(void);
 PRIVATE_FCT void Error_ISR(void);
@@ -64,6 +63,8 @@ PRIVATE_FCT void Set_baudrate(void);
 PRIVATE_FCT void init_LINflex_filter_submode(void);
 PRIVATE_FCT void init_ID_list(void);
 PRIVATE_FCT void init_LIN_handlers(void);
+/*============================================================================*/
+
 
 
 /* Inline functions */
@@ -71,7 +72,6 @@ PRIVATE_FCT void init_LIN_handlers(void);
 /*============================================================================*/
 
 /* Private functions */
-/*============================================================================*/
 /*============================================================================*/
 
 /**************************************************************
@@ -133,25 +133,17 @@ PRIVATE_FCT void init_Slave_mode(void)
  *  Return               :  void
  *  Precondition         :  The linflex must be on init mode.
  *  Postcondition        :  The baud rate is setted.
+ *  Req					 :				
  **************************************************************/
 PRIVATE_FCT void Set_baudrate(void)
 {
 	/* LFDIV = Mantissa + (Fractional/16)
-	 * Tx/Rx_baud = (fperiph_set_1_clk /(16 × LFDIV)  with 0.01% Error  */
-#if(KINETIS) 
-//	LINFLEX_0.LINIBRR.R = 208;/* Mantissa 	= 208*/
-//	LINFLEX_0.LINFBRR.R = 5;  /* Fractional = 5 */
+	 * Tx/Rx_baud = (fperiph_set_1_clk /(16 × LFDIV)  */
 	LINFLEX_0.LINIBRR.R = 416;	/* Mantissa   = 416           br= 9600*/ 
 	LINFLEX_0.LINFBRR.R = 11;  	/* Fractional = 11 */
-#endif
-	/* LFDIV = 208 + (5/16) = 208.3125
-	 * Tx/Rx_baud = (64000000 /(16 × 208.3125) = 19201.9 with 0.01% Error  */
-	
-#if(KINETIS == 0) /*9600*/
-	LINFLEX_0.LINIBRR.R = 416;	/* Mantissa   = 416*/
-	LINFLEX_0.LINFBRR.R = 11;  	/* Fractional = 11 */
-#endif
 
+	/* LFDIV = 416 + (11/16) = 416.6875
+	 * Tx/Rx_baud = (64000000 /(16 × 416.6875) = 9599.52 with 0.005% Error  */
 }
 
 
@@ -167,7 +159,7 @@ PRIVATE_FCT void init_LINflex_filter_submode(void)
 {
 	LINFLEX_0.IFER.R = 0x0000;  /*Deactivates filters 0 to 3 */
 	LINFLEX_0.IFMR.R = 0x0000;  /*Filters in list mode */
-	LINFLEX_0.IFER.R = 0x000F;	/*Activates filters 0 to 3 */
+	LINFLEX_0.IFER.R = 0xF;	/*Activates filters 0 to 3 */
 }	
 
 
@@ -263,7 +255,7 @@ PRIVATE_FCT void init_LIN_handlers(void)
 
 
 }
-
+/*============================================================================*/
 
 /* Exported functions */
 /*============================================================================*/
@@ -275,6 +267,8 @@ PRIVATE_FCT void init_LIN_handlers(void)
  *  Return               :  void
  *  Precondition         :  The correct initialization of the startup code.
  *  Postcondition        :  The LINflex module is enable to work with the ID’s for slave 4.
+ *  SW design			 :	5.4
+ *  Req. 				 :	4.0 to 4.15 and 7.13
  **************************************************************/
 void init_LINflex_Slv(void)
 {
@@ -319,7 +313,7 @@ void Rx_ISR(void)
  **************************************************************/
 void Tx_ISR(void)
 {
-	//T_ULONG status = LINFLEX_0.LINSR.R;
+	
 	rub_Rx_ID = GETBYTE_ID;
 	if(LINFLEX_0.LINSR.B.HRF)
 	{

@@ -77,13 +77,17 @@
  *  Return               :  void
  *  Precondition         :  The correct initialization of the startup code.
  *  Postcondition        :  The cpu can be configured and the program can start.
+ *  SW design			 :	5.2
  **************************************************************/
 void main(void) 
 {
+	/*Initializes the system for the correct operation*/
 	init_system();
+	/*Initializes the counters with the offsets*/
 	init_Sch_TimeCntrs();
+	/*Initializes the LINflex*/
 	init_LINflex_Slv();
-	
+	/*Starts the scheduler execution*/
 	Sch_function_execution();	
 }
 
